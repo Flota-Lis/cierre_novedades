@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novedades Arranque de Flota – Electro Clutch S.A.S</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+:root{
+  --bg:#f0ece3;--card:#fff;--ink:#1a1a1a;--accent:#c0392b;
+  --accent2:#2c3e50;--border:#d4c9b5;--muted:#8a8070;--row-alt:#faf8f3;
+  --green:#27ae60;--green-d:#1e8449;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+
+/* HEADER */
+header{background:var(--accent2);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.logo-area{display:flex;align-items:center;gap:14px}
+.logo-box{width:46px;height:46px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:.5px;text-align:center;color:#fff;line-height:1.3;flex-shrink:0}
+.header-title h1{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
+.header-title p{font-size:12px;opacity:.65;margin-top:1px}
+.header-date{font-size:12px;opacity:.75;text-align:right;white-space:nowrap}
+
+/* LAYOUT */
+.container{max-width:980px;margin:0 auto;padding:24px 16px 80px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.card-header{background:var(--accent2);color:#fff;padding:11px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.5px;display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:120px 1fr;gap:12px 16px;align-items:start}
+.form-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding-top:10px}
+input[type=text],input[type=date],textarea{width:100%;border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(192,57,43,.1)}
+textarea{resize:vertical;min-height:58px}
+
+.check-row{display:flex;gap:20px;padding-top:8px}
+.check-label{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;cursor:pointer;user-select:none}
+.check-label input{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
+
+/* SIGNATURE */
+.sig-wrap{border:2px dashed var(--border);border-radius:8px;background:#fafaf7;padding:6px;position:relative}
+#sigCanvas{display:block;width:100%;height:120px;cursor:crosshair;touch-action:none;border-radius:5px;background:#fff}
+.sig-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;color:#ccc;pointer-events:none;transition:opacity .3s}
+.sig-wrap.has-sig .sig-hint{opacity:0}
+.sig-actions{display:flex;gap:8px;margin-top:7px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.btn-red{background:var(--accent);color:#fff}.btn-red:hover{background:#a93226;transform:translateY(-1px)}
+.btn-dark{background:var(--accent2);color:#fff}.btn-dark:hover{background:#1a252f;transform:translateY(-1px)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--green-d);transform:translateY(-1px)}
+.btn-orange{background:#e67e22;color:#fff}.btn-orange:hover{background:#ca6f1e;transform:translateY(-1px)}
+.btn-purple{background:#8e44ad;color:#fff}.btn-purple:hover{background:#6c3483;transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 13px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+.actions-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+/* ACTION BAR */
+.action-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px}
+.count-pill{background:var(--accent2);color:#fff;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.3px}
+.action-btns{display:flex;gap:8px;flex-wrap:wrap}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+#mainTable{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
+#mainTable thead tr{background:var(--accent2)}
+#mainTable thead th{padding:10px 14px;text-align:left;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:13px;font-weight:400;color:#fff;white-space:nowrap}
+#mainTable tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+#mainTable tbody tr:nth-child(even){background:var(--row-alt)}
+#mainTable tbody tr:hover{background:#fff3f1}
+#mainTable tbody td{padding:9px 14px;vertical-align:middle;line-height:1.4}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-si{background:#d5f5e3;color:#1e8449}
+.badge-no{background:#fadbd8;color:#922b21}
+.sig-preview{max-height:36px;max-width:90px;border:1px solid var(--border);border-radius:3px;vertical-align:middle}
+.del-btn{background:none;border:none;cursor:pointer;color:#e74c3c;padding:3px 7px;border-radius:5px;font-size:15px;transition:background .15s}
+.del-btn:hover{background:#fdecea}
+
+.empty-state{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-state .eicon{font-size:38px;margin-bottom:8px}
+.empty-state p{font-size:14px}
+
+/* SCREENSHOT PREVIEW TABLE (hidden, clean version) */
+#screenshotArea{
+  position:fixed;top:-9999px;left:-9999px;
+  background:#fff;padding:0;
+  font-family:'DM Sans',sans-serif;
+  width:900px;
+}
+.ss-header{background:var(--accent2);color:#fff;padding:16px 24px;display:flex;align-items:center;gap:14px}
+.ss-logo{width:40px;height:40px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:9px;text-align:center;color:#fff;line-height:1.3;flex-shrink:0}
+.ss-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
+.ss-sub{font-size:12px;opacity:.7;margin-top:2px}
+.ss-date{margin-left:auto;font-size:12px;opacity:.75}
+.ss-body{padding:0}
+#ssTable{width:100%;border-collapse:collapse;font-size:12px}
+#ssTable thead tr{background:var(--accent2)}
+#ssTable thead th{padding:9px 14px;text-align:left;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:12px;color:#fff;font-weight:400}
+#ssTable tbody tr{border-bottom:1px solid #e8e0d4}
+#ssTable tbody tr:nth-child(even){background:#faf8f3}
+#ssTable tbody td{padding:8px 14px;vertical-align:middle}
+#ssTable .sig-img{max-height:34px;max-width:80px}
+.ss-footer{background:#f5f0e8;padding:10px 24px;font-size:11px;color:#888;text-align:right;border-top:1px solid #e0d8cc}
+
+/* GOOGLE SHEETS MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);transform:translateY(20px);transition:transform .25s}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-head{background:var(--accent2);color:#fff;padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px}
+.close-modal{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;opacity:.7;line-height:1}
+.close-modal:hover{opacity:1}
+.modal-body{padding:22px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-num{width:28px;height:28px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px}
+.step-content h4{font-size:14px;font-weight:700;margin-bottom:4px}
+.step-content p{font-size:13px;color:#555;line-height:1.5}
+.step-content a{color:var(--accent);text-decoration:none;font-weight:600}
+.step-content a:hover{text-decoration:underline}
+.code-block{background:#f4f1eb;border:1px solid var(--border);border-radius:7px;padding:12px 14px;font-family:monospace;font-size:11px;line-height:1.6;color:#2c3e50;white-space:pre-wrap;word-break:break-all;margin-top:8px;position:relative}
+.copy-code{position:absolute;top:8px;right:8px;background:var(--accent2);color:#fff;border:none;border-radius:5px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.copy-code:hover{background:var(--accent)}
+.url-input-wrap{display:flex;gap:8px;margin-top:10px}
+.url-input-wrap input{flex:1}
+.saved-indicator{font-size:12px;color:var(--green);font-weight:600;margin-top:6px;display:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:26px;right:22px;background:var(--accent2);color:#fff;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:all .28s;pointer-events:none;z-index:500;max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--accent)}
+
+@media(max-width:640px){
+  .form-grid{grid-template-columns:1fr}
+  .form-label{padding-top:0}
+  header{flex-direction:column;text-align:center;gap:8px}
+  .header-date{text-align:center}
+  .action-bar{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-box">ELECTRO<br>CLUTCH<br>S.A.S</div>
+    <div class="header-title">
+      <h1>Novedades Arranque de Flota</h1>
+      <p>Electro Clutch S.A.S — Registro de intervenciones</p>
+    </div>
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<div class="container">
+
+  <!-- FORM -->
+  <div class="card">
+    <div class="card-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M12 5v14M5 12h14"/></svg>
+      Agregar Registro
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-label">Fecha</div>
+        <input type="date" id="f_fecha">
+
+        <div class="form-label">Placa</div>
+        <input type="text" id="f_placa" placeholder="Ej: 355, 466, 725...">
+
+        <div class="form-label">Intervención</div>
+        <textarea id="f_intervencion" placeholder="Describa la novedad o intervención realizada..."></textarea>
+
+        <div class="form-label">Cerrado</div>
+        <div class="check-row">
+          <label class="check-label"><input type="checkbox" id="f_si" onchange="toggleCerrado('si')"> SÍ</label>
+          <label class="check-label"><input type="checkbox" id="f_no" onchange="toggleCerrado('no')"> NO</label>
+        </div>
+
+        <div class="form-label">Firma</div>
+        <div>
+          <div class="sig-wrap" id="sigWrap">
+            <span class="sig-hint">Dibuje la firma aquí</span>
+            <canvas id="sigCanvas"></canvas>
+          </div>
+          <div class="sig-actions">
+            <button class="btn btn-ghost btn-sm" onclick="clearSig()">🗑 Borrar firma</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn btn-red" onclick="addRecord()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+          Agregar Registro
+        </button>
+        <button class="btn btn-ghost" onclick="clearForm()">Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card">
+    <div class="card-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Registros del Día
+    </div>
+    <div class="card-body">
+      <div class="action-bar">
+        <span class="count-pill" id="countPill">0 registros</span>
+        <div class="action-btns">
+          <button class="btn btn-green btn-sm" id="btnExcel" onclick="exportExcel()" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Descargar Excel
+          </button>
+          <button class="btn btn-orange btn-sm" id="btnScreenshot" onclick="takeScreenshot()" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/></svg>
+            Pantallazo PNG
+          </button>
+          <button class="btn btn-purple btn-sm" id="btnSheets" onclick="openSheetsModal()" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v5"/><path d="M17 21v-6h6M17 21H9a2 2 0 01-2-2v-1"/></svg>
+            Enviar a Google Sheets
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="mainTable">
+          <thead>
+            <tr><th>#</th><th>Fecha</th><th>Placa</th><th>Intervención</th><th>Cerrado</th><th>Firma</th><th></th></tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="7"><div class="empty-state"><div class="eicon">📋</div><p>No hay registros. Agregue el primero arriba.</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREENSHOT SOURCE (clean, off-screen) -->
+<div id="screenshotArea">
+  <div class="ss-header">
+    <div class="ss-logo">ELECTRO<br>CLUTCH<br>S.A.S</div>
+    <div>
+      <div class="ss-title">Novedades Arranque de Flota</div>
+      <div class="ss-sub">Electro Clutch S.A.S</div>
+    </div>
+    <div class="ss-date" id="ssDate"></div>
+  </div>
+  <div class="ss-body">
+    <table id="ssTable">
+      <thead><tr><th>#</th><th>Fecha</th><th>Placa</th><th>Intervención / Novedad</th><th>Cerrado</th><th>Firma</th></tr></thead>
+      <tbody id="ssBody"></tbody>
+    </table>
+  </div>
+  <div class="ss-footer" id="ssFooter"></div>
+</div>
+
+<!-- GOOGLE SHEETS MODAL -->
+<div class="modal-bg" id="modalBg" onclick="closeSheetsModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">📊 Enviar a Google Sheets</h3>
+      <button class="close-modal" onclick="document.getElementById('modalBg').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- VISTA: YA CONFIGURADO -->
+      <div id="viewReady" style="display:none">
+        <div style="background:#f0faf4;border:1px solid #a9dfbf;border-radius:8px;padding:16px 18px;margin-bottom:18px">
+          <div style="font-size:13px;font-weight:700;color:#1e8449;margin-bottom:4px">✔ Google Sheets conectado</div>
+          <div style="font-size:12px;color:#555;word-break:break-all" id="urlDisplay"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-purple" id="btnSendSheets" onclick="sendToSheets()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            Enviar <span id="sendCount"></span> registro(s) al Sheet
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="showSetup()">⚙ Cambiar URL</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('modalBg').classList.remove('open')">Cerrar</button>
+        </div>
+      </div>
+
+      <!-- VISTA: CONFIGURACIÓN -->
+      <div id="viewSetup">
+        <p style="font-size:13px;color:#555;margin-bottom:18px">Sigue estos pasos <strong>una sola vez</strong> para conectar:</p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Crea un Google Sheet nuevo</h4>
+            <p>Ve a <a href="https://sheets.new" target="_blank">sheets.new</a>. En la fila 1 pon: <strong>Timestamp, Fecha, Placa, Intervención, Cerrado</strong></p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Abre el Editor de Scripts</h4>
+            <p>En el Sheet: <strong>Extensiones → Apps Script</strong>. Borra todo y pega esto:</p>
+            <div class="code-block" id="scriptCode">const SHEET_NAME = "Hoja 1";
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+    data.rows.forEach(row => {
+      sheet.appendRow([
+        new Date().toLocaleString("es-CO"),
+        row.fecha, row.placa, row.intervencion, row.cerrado
+      ]);
+    });
+    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ok:false,error:err.message})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+function doGet(e) { return ContentService.createTextOutput("OK"); }</div>
+            <button class="copy-code" onclick="copyScript()">Copiar</button>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Publica como aplicación web</h4>
+            <p><strong>Implementar → Nueva implementación</strong>. Tipo: Aplicación web. Ejecutar como: Yo. Acceso: <strong>Cualquier persona</strong>. Copia la URL.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Pega la URL aquí y guarda</h4>
+            <div class="url-input-wrap">
+              <input type="text" id="sheetsUrl" placeholder="https://script.google.com/macros/s/...">
+              <button class="btn btn-dark btn-sm" onclick="saveUrl()">Guardar</button>
+            </div>
+            <div class="saved-indicator" id="savedIndicator">✔ URL guardada</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATE ────────────────────────────────────────────────
+const todayStr = new Date().toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('headerDate').textContent = todayStr;
+document.getElementById('f_fecha').valueAsDate = new Date();
+
+// ─── CANVAS SIGNATURE ────────────────────────────────────
+const canvas = document.getElementById('sigCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, lx = 0, ly = 0;
+
+function setupCtx(){ ctx.strokeStyle='#111'; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round'; }
+
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  const r = window.devicePixelRatio||1;
+  const snap = canvas.toDataURL();
+  canvas.width = rect.width*r; canvas.height = rect.height*r;
+  ctx.scale(r,r); setupCtx();
+  const img=new Image(); img.onload=()=>ctx.drawImage(img,0,0,rect.width,rect.height); img.src=snap;
+}
+resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+
+function pos(e){ const r=canvas.getBoundingClientRect(),s=e.touches?e.touches[0]:e; return [s.clientX-r.left,s.clientY-r.top]; }
+canvas.addEventListener('mousedown',e=>{ drawing=true;[lx,ly]=pos(e); });
+canvas.addEventListener('touchstart',e=>{ e.preventDefault();drawing=true;[lx,ly]=pos(e); },{passive:false});
+function drawMove(e){
+  if(!drawing)return;
+  const[x,y]=pos(e);
+  ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(x,y); ctx.stroke();
+  [lx,ly]=[x,y];
+  document.getElementById('sigWrap').classList.add('has-sig');
+}
+canvas.addEventListener('mousemove',drawMove);
+canvas.addEventListener('touchmove',e=>{ e.preventDefault(); drawMove(e); },{passive:false});
+['mouseup','touchend','mouseleave'].forEach(ev=>canvas.addEventListener(ev,()=>drawing=false));
+
+function clearSig(){
+  const r=canvas.getBoundingClientRect(); ctx.clearRect(0,0,r.width,r.height);
+  document.getElementById('sigWrap').classList.remove('has-sig');
+}
+function hasSig(){ const d=ctx.getImageData(0,0,canvas.width,canvas.height).data; for(let i=3;i<d.length;i+=4) if(d[i]>10) return true; return false; }
+function getSig(){ return hasSig() ? canvas.toDataURL('image/png') : null; }
+
+// ─── CERRADO ─────────────────────────────────────────────
+function toggleCerrado(w){ document.getElementById(w==='si'?'f_no':'f_si').checked=false; }
+
+// ─── RECORDS ─────────────────────────────────────────────
+let records = JSON.parse(localStorage.getItem('flotaV4')||'[]');
+function save(){ localStorage.setItem('flotaV4',JSON.stringify(records)); }
+
+function addRecord(){
+  const fecha = document.getElementById('f_fecha').value;
+  const placa = document.getElementById('f_placa').value.trim().toUpperCase();
+  const intervencion = document.getElementById('f_intervencion').value.trim();
+  const cerrado = document.getElementById('f_si').checked?'SI': document.getElementById('f_no').checked?'NO':'';
+  const firma = getSig();
+  if(!placa||!intervencion){ toast('⚠ Completa Placa e Intervención','error'); return; }
+  records.push({ id:Date.now(), fecha, placa, intervencion, cerrado, firma });
+  save(); render(); clearForm();
+  toast('✔ Registro agregado','success');
+}
+
+function deleteRecord(id){
+  if(!confirm('¿Eliminar este registro?')) return;
+  records = records.filter(r=>r.id!==id);
+  save(); render();
+}
+
+function clearForm(){
+  document.getElementById('f_placa').value='';
+  document.getElementById('f_intervencion').value='';
+  document.getElementById('f_si').checked=false;
+  document.getElementById('f_no').checked=false;
+  clearSig();
+}
+
+function render(){
+  const tbody = document.getElementById('tableBody');
+  const n = records.length;
+  document.getElementById('countPill').textContent = `${n} registro${n!==1?'s':''}`;
+  ['btnExcel','btnScreenshot','btnSheets'].forEach(id=>{ document.getElementById(id).disabled = n===0; });
+
+  if(!n){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="eicon">📋</div><p>No hay registros.</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = records.map((r,i)=>`
+    <tr>
+      <td><strong>${i+1}</strong></td>
+      <td style="white-space:nowrap">${r.fecha||'—'}</td>
+      <td><strong>${r.placa}</strong></td>
+      <td style="max-width:280px">${r.intervencion}</td>
+      <td>${r.cerrado==='SI'?'<span class="badge badge-si">SÍ</span>':r.cerrado==='NO'?'<span class="badge badge-no">NO</span>':'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${r.firma?`<img class="sig-preview" src="${r.firma}">`:'<span style="color:var(--muted);font-size:12px">Sin firma</span>'}</td>
+      <td><button class="del-btn" onclick="deleteRecord(${r.id})" title="Eliminar">✕</button></td>
+    </tr>`).join('');
+}
+
+// ─── EXPORT EXCEL (sin firmas) ────────────────────────────
+function exportExcel(){
+  if(!records.length) return;
+  const wsData = [
+    ['ELECTRO CLUTCH S.A.S — NOVEDADES ARRANQUE DE FLOTA'],
+    [`Generado: ${new Date().toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`],
+    [],
+    ['#','Fecha','Placa','Intervención / Novedad','Cerrado (SÍ/NO)']
+  ];
+  records.forEach((r,i) => wsData.push([i+1, r.fecha||'', r.placa, r.intervencion, r.cerrado||'']));
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = [{wch:4},{wch:14},{wch:10},{wch:65},{wch:14}];
+  ws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:4}},{s:{r:1,c:0},e:{r:1,c:4}}];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Novedades Flota');
+  XLSX.writeFile(wb, `novedades_flota_${new Date().toISOString().slice(0,10)}.xlsx`);
+  toast('📥 Excel descargado','success');
+}
+
+// ─── SCREENSHOT ───────────────────────────────────────────
+async function takeScreenshot(){
+  if(!records.length) return;
+
+  // Build clean screenshot table
+  const ssBody = document.getElementById('ssBody');
+  document.getElementById('ssDate').textContent = todayStr;
+  document.getElementById('ssFooter').textContent = `Generado el ${new Date().toLocaleString('es-CO')} | Electro Clutch S.A.S`;
+
+  ssBody.innerHTML = records.map((r,i)=>`
+    <tr>
+      <td><strong>${i+1}</strong></td>
+      <td style="white-space:nowrap">${r.fecha||'—'}</td>
+      <td><strong>${r.placa}</strong></td>
+      <td>${r.intervencion}</td>
+      <td style="text-align:center">${r.cerrado==='SI'?'✅ SÍ':r.cerrado==='NO'?'❌ NO':'—'}</td>
+      <td>${r.firma?`<img class="sig-img" src="${r.firma}">`:'—'}</td>
+    </tr>`).join('');
+
+  const el = document.getElementById('screenshotArea');
+  el.style.top = '0'; el.style.left = '0'; el.style.position = 'fixed'; el.style.zIndex='-1';
+
+  try{
+    toast('📸 Generando imagen...','');
+    const cvs = await html2canvas(el, { scale:2, useCORS:true, backgroundColor:'#fff', logging:false });
+    el.style.top='-9999px'; el.style.left='-9999px'; el.style.position='fixed'; el.style.zIndex='';
+
+    const link = document.createElement('a');
+    link.download = `novedades_flota_${new Date().toISOString().slice(0,10)}.png`;
+    link.href = cvs.toDataURL('image/png');
+    link.click();
+    toast('📸 Pantallazo descargado','success');
+  }catch(err){
+    el.style.top='-9999px'; el.style.left='-9999px';
+    toast('❌ Error al generar imagen','error');
+    console.error(err);
+  }
+}
+
+// ─── GOOGLE SHEETS ────────────────────────────────────────
+const STORAGE_KEY = 'flotaSheetsUrl';
+
+function openSheetsModal(){
+  const url = localStorage.getItem(STORAGE_KEY)||'';
+  if(url){
+    showReady(url);
+  } else {
+    showSetup();
+  }
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function showReady(url){
+  url = url || localStorage.getItem(STORAGE_KEY)||'';
+  document.getElementById('viewReady').style.display='block';
+  document.getElementById('viewSetup').style.display='none';
+  document.getElementById('urlDisplay').textContent = url;
+  document.getElementById('sendCount').textContent = records.length;
+}
+
+function showSetup(){
+  document.getElementById('viewReady').style.display='none';
+  document.getElementById('viewSetup').style.display='block';
+  document.getElementById('sheetsUrl').value = localStorage.getItem(STORAGE_KEY)||'';
+}
+
+function closeSheetsModal(e){
+  if(e && e.target !== document.getElementById('modalBg')) return;
+  document.getElementById('modalBg').classList.remove('open');
+}
+
+function saveUrl(){
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if(!url){ toast('Pega la URL del script primero','error'); return; }
+  localStorage.setItem(STORAGE_KEY, url);
+  const ind = document.getElementById('savedIndicator');
+  ind.style.display='block'; setTimeout(()=>ind.style.display='none',3000);
+  toast('✔ URL guardada','success');
+  setTimeout(()=>showReady(url), 1200);
+}
+
+function copyScript(){
+  const text = document.getElementById('scriptCode').textContent;
+  navigator.clipboard.writeText(text).then(()=>toast('✔ Código copiado','success'));
+}
+
+async function sendToSheets(){
+  const url = localStorage.getItem(STORAGE_KEY);
+  if(!url){ toast('Primero guarda la URL del script','error'); return; }
+  if(!records.length){ toast('No hay registros para enviar','error'); return; }
+
+  const btn = document.getElementById('btnSendSheets');
+  const original = btn.innerHTML;
+  btn.innerHTML='⏳ Enviando...'; btn.disabled=true;
+
+  const payload = { rows: records.map(r=>({ fecha:r.fecha||'', placa:r.placa, intervencion:r.intervencion, cerrado:r.cerrado||'' })) };
+
+  try{
+    await fetch(url, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    toast(`✅ ${records.length} registro(s) enviados a Google Sheets`,'success');
+    document.getElementById('modalBg').classList.remove('open');
+  }catch(err){
+    toast('❌ Error de conexión. Revisa la URL del script.','error');
+    console.error(err);
+  }finally{
+    btn.innerHTML=original; btn.disabled=false;
+  }
+}
+
+// ─── TOAST ───────────────────────────────────────────────
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(type?' '+type:'')+' show';
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// INIT
+render();
+</script>
+</body>
+</html>
