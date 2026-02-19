@@ -519,19 +519,16 @@ async function takeScreenshot(){
 
 // ─── GOOGLE SHEETS ────────────────────────────────────────
 const STORAGE_KEY = 'flotaSheetsUrl';
+const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbw2_PVe7fyAy2hFjrWxlXXd1qY1xhvl92tEv4CYQqycD0oGyXOH4jP0yUFHCKBMSvH0/exec';
+function getSheetsUrl(){ return localStorage.getItem(STORAGE_KEY) || DEFAULT_URL; }
 
 function openSheetsModal(){
-  const url = localStorage.getItem(STORAGE_KEY)||'';
-  if(url){
-    showReady(url);
-  } else {
-    showSetup();
-  }
+  showReady(getSheetsUrl());
   document.getElementById('modalBg').classList.add('open');
 }
 
 function showReady(url){
-  url = url || localStorage.getItem(STORAGE_KEY)||'';
+  url = url || getSheetsUrl();
   document.getElementById('viewReady').style.display='block';
   document.getElementById('viewSetup').style.display='none';
   document.getElementById('urlDisplay').textContent = url;
@@ -541,7 +538,7 @@ function showReady(url){
 function showSetup(){
   document.getElementById('viewReady').style.display='none';
   document.getElementById('viewSetup').style.display='block';
-  document.getElementById('sheetsUrl').value = localStorage.getItem(STORAGE_KEY)||'';
+  document.getElementById('sheetsUrl').value = getSheetsUrl();
 }
 
 function closeSheetsModal(e){
@@ -565,7 +562,7 @@ function copyScript(){
 }
 
 async function sendToSheets(){
-  const url = localStorage.getItem(STORAGE_KEY);
+  const url = getSheetsUrl();
   if(!url){ toast('Primero guarda la URL del script','error'); return; }
   if(!records.length){ toast('No hay registros para enviar','error'); return; }
 
